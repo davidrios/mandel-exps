@@ -1,5 +1,6 @@
 import sys
 from Tkinter import *
+from PIL import Image, ImageTk
 
 
 def run(mod, size=600, itermax=100):
@@ -9,16 +10,15 @@ def run(mod, size=600, itermax=100):
     zoom = 4.0
 
     bitmap = mandel(size, itermax, x_center, y_center, zoom)
+    bitmapstr = ''.join(''.join(chr(j) for j in i) for i in bitmap)
+
+    im = Image.fromstring('L', (size, size), bitmapstr)
 
     root = Tk()
     w = Canvas(root, width=size, height=size)
     w.pack()
-
-    for y, row in enumerate(bitmap):
-        for x, color in enumerate(row):
-            w.create_line(x, size - y, x + 1, size + 1 - y, fill=color == 0 and 'black' or 'white')
-            w.pack()
-    print 'done'
+    w.photo = ImageTk.PhotoImage(im)
+    w.create_image(0, 0, anchor='nw', image=w.photo)
     root.mainloop()
 
 if __name__ == '__main__':
