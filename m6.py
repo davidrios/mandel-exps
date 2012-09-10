@@ -7,6 +7,7 @@ import sys
 import json
 from multiprocessing import cpu_count
 
+import asynloop
 
 JOBS = []
 COMPLETED_JOBS = []
@@ -173,7 +174,7 @@ if __name__ == '__main__':
         pid = os.fork()
         if pid > 0:
             Server('127.0.0.1', 15005)
-            asyncore.loop()
+            asynloop.loop()
         else:
             clientNum = 0
             for cpu in range(int(parallel * cpu_count()) - 1):
@@ -185,4 +186,4 @@ if __name__ == '__main__':
                 clientNum += 1
 
             Client('127.0.0.1', 15005, clientNum)
-            asyncore.loop()
+            asynloop.loop()
