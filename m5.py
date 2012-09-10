@@ -11,7 +11,7 @@ def render_row(args):
     zoom = args[4]
 
     res = []
-    for i in xrange(size):
+    for i in range(size):
         x = x_center + zoom * float(i - size / 2) / size
 
         a, b = (0.0, 0.0)
@@ -33,14 +33,14 @@ if __name__ == '__main__':
     size = int(sys.argv[1])
     max_iteration = int(sys.argv[2])
     zoom = len(sys.argv) >= 4 and float(sys.argv[3]) or 4.0
-    parallel = len(sys.argv) >= 5 and int(sys.argv[4]) or 0
+    parallel = len(sys.argv) >= 5 and float(sys.argv[4]) or 0
     x_center = -1.0
     y_center = 0.0
 
     mapf = map
     if parallel:
-        p = Pool(cpu_count() * parallel)
+        p = Pool(int(cpu_count() * parallel))
         mapf = p.map
     res = mapf(render_row,
               (((y_center + zoom * float(i - size / 2) / size),
-                size, max_iteration, x_center, zoom) for i in xrange(size)))
+                size, max_iteration, x_center, zoom) for i in range(size)))
