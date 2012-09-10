@@ -88,7 +88,7 @@ def loop_epoll(timeout=0.0, map=None):
             if flags:
                 # Only check for exceptions if object was either readable
                 # or writable.
-                flags |= select.EPOLLERR | select.EPOLLHUP | select.EPOLLET
+                flags |= select.EPOLLERR | select.EPOLLHUP
                 pollster.register(fd, flags)
         r = pollster.poll(timeout)
         for fd, flags in r:
@@ -107,7 +107,7 @@ def loop(timeout=30.0, map=None, count=None):
         poll_fun = loop_kqueue
     elif hasattr(select, 'epoll'):
         print 'using epoll'
-        poll_fun = loop_kqueue
+        poll_fun = loop_epoll
     else:
         print 'using select'
         poll_fun = poll
