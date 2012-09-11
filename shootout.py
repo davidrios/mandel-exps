@@ -49,4 +49,4 @@ def main(out):
 
 if __name__ == '__main__':
     size = int(sys.argv[1])
-    main(sys.stdout)
+    main(getattr(sys.stdout, 'buffer', None) or sys.stdout)
