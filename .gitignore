@@ -1,6 +1,5 @@
 mandelenv*
-*.pgm
-*.png
+out
 
 # mac shit
 .DS_Store
