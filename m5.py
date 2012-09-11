@@ -4,11 +4,7 @@ from multiprocessing import Pool, cpu_count
 
 
 def render_row(args):
-    y = args[0]
-    size = args[1]
-    max_iteration = args[2]
-    x_center = args[3]
-    zoom = args[4]
+    y, size, max_iteration, x_center, zoom = args
 
     res = []
     for i in range(size):
@@ -24,10 +20,10 @@ def render_row(args):
         if iteration == max_iteration:
             color_value = 0
         else:
-            color_value = 255 #- (iteration * 10 % 255)
+            color_value = 255 - (iteration * 10 % 255)
 
         res.append(chr(color_value))
-    return res
+    return ''.join(res)
 
 if __name__ == '__main__':
     size = int(sys.argv[1])
@@ -37,10 +33,15 @@ if __name__ == '__main__':
     x_center = -1.0
     y_center = 0.0
 
-    mapf = map
+    sys.stdout.write("P5\n%d %d\n255\n" % (size, size))
     if parallel:
         p = Pool(int(cpu_count() * parallel))
-        mapf = p.map
-    res = mapf(render_row,
-              (((y_center + zoom * float(i - size / 2) / size),
-                size, max_iteration, x_center, zoom) for i in range(size)))
+        sys.stdout.write(''.join(
+            p.map(render_row,
+                  (((y_center + zoom * float(i - size / 2) / size),
+                    size, max_iteration, x_center, zoom) for i in range(size)))))
+    else:
+        for y in range(size):
+            data = render_row(((y_center + zoom * float(y - size / 2) / size),
+                               size, max_iteration, x_center, zoom))
+            sys.stdout.write(data)
