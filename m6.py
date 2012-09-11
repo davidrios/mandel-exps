@@ -10,7 +10,9 @@ from multiprocessing import cpu_count
 import asynloop
 
 JOBS = []
-COMPLETED_JOBS = []
+COMPLETED_JOBS = {}
+JOBS_TOTAL = 0
+COMPLETED_TOTAL = 0
 TERMINATOR = '.END'
 
 
@@ -56,6 +58,7 @@ class ServerHandler(BaseHandler):
         self.nojobs_callback = nojobs_callback
 
     def found_terminator(self):
+        global COMPLETED_TOTAL
         command = BaseHandler.found_terminator(self)
 
         if command == 'get':
@@ -64,7 +67,7 @@ class ServerHandler(BaseHandler):
             except StopIteration:
                 self.announce('no jobs left')
                 self.close()
-                self.nojobs_callback()
+                # self.push(command='nojobs')
                 return
             self.announce('sending job %s' % repr(job))
             self.push(command='job', data=job)
@@ -75,7 +78,10 @@ class ServerHandler(BaseHandler):
                 self.announce('no data sent')
                 return
             self.announce('received report')
-            COMPLETED_JOBS.append(data)
+            COMPLETED_JOBS[data['job']] = data['data']
+            COMPLETED_TOTAL += 1
+            if COMPLETED_TOTAL == JOBS_TOTAL:
+                self.nojobs_callback()
         elif command == 'terminate':
             self.close()
         else:
@@ -118,7 +124,7 @@ class Client(BaseHandler):
                 return
             self.announce('got job %s' % repr(job))
             # self.announce('sending report')
-            self.push(command='report', data=dict(test=1))
+            self.push(command='report', data=dict(job=job[0], data=render_row(job)))
             self.get_job()
 
     def handle_close(self):
@@ -131,11 +137,7 @@ class Client(BaseHandler):
 
 
 def render_row(args):
-    y = args[0]
-    size = args[1]
-    max_iteration = args[2]
-    x_center = args[3]
-    zoom = args[4]
+    row, y, size, max_iteration, x_center, zoom = args
 
     res = []
     for i in range(size):
@@ -153,7 +155,7 @@ def render_row(args):
         else:
             color_value = 255 #- (iteration * 10 % 255)
 
-        res.append(chr(color_value))
+        res.append(color_value)
     return res
 
 if __name__ == '__main__':
@@ -164,8 +166,9 @@ if __name__ == '__main__':
     x_center = -1.0
     y_center = 0.0
 
-    JOBS = (((y_center + zoom * float(i - size / 2) / size),
-            size, max_iteration, x_center, zoom) for i in range(size))
+    JOBS = ((i, (y_center + zoom * float(i - size / 2) / size),
+             size, max_iteration, x_center, zoom) for i in range(size))
+    JOBS_TOTAL = size
 
     if not parallel:
         res = map(render_row, JOBS)
