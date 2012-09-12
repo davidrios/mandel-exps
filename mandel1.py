@@ -20,7 +20,7 @@ def mandel(size, max_iteration, x_center, y_center, zoom):
             if iteration != max_iteration:
                 color_value = 255 - (iteration * 10 % 255)
 
-            cols.append(color_value)
-        rows.append(cols)
+            cols.append(chr(color_value))
+        rows.append(''.join(cols))
 
-    return rows
+    return ''.join(rows)

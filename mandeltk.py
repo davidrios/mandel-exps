@@ -3,16 +3,17 @@ from Tkinter import *
 from PIL import Image, ImageTk
 
 
-def run(mod, size=600, itermax=100):
+def run(mod, size=600, itermax=500):
     mandel = __import__(mod).mandel
     x_center = -1.0
     y_center = 0.0
     zoom = 4.0
 
     bitmap = mandel(size, itermax, x_center, y_center, zoom)
-    bitmapstr = ''.join(''.join(chr(j) for j in i) for i in bitmap)
 
-    im = Image.fromstring('L', (size, size), bitmapstr)
+    if not bitmap:
+        return
+    im = Image.fromstring('L', (size, size), bitmap)
 
     root = Tk()
     w = Canvas(root, width=size, height=size)
