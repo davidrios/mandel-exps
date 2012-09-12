@@ -1,13 +1,15 @@
 from __future__ import division
 
+from mandel_shared import *
 
-def mandel(size, max_iteration, x_center, y_center, zoom):
+
+def mandel(rfd, wfd, size, max_iteration, x_center, y_center, zoom):
     rows = []
     for j in xrange(size):
         cols = []
         for i in xrange(size):
-            x = x_center + zoom * float(i - size / 2) / size
-            y = y_center + zoom * float(j - size / 2) / size
+            x = convert_x2r(i, x_center, size, zoom)
+            y = convert_y2i(j, y_center, size, zoom)
 
             a, b = (0.0, 0.0)
             iteration = 0

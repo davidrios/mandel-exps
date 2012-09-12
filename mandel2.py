@@ -2,7 +2,8 @@ from __future__ import division
 import os
 import select
 import multiprocessing
-import sys
+
+from mandel_shared import *
 
 worker_map = {}
 
@@ -12,7 +13,7 @@ def render_row(args):
 
     res = []
     for i in range(size):
-        x = x_center + zoom * float(i - size / 2) / size
+        x = convert_x2r(i, x_center, size, zoom)
 
         a, b = (0.0, 0.0)
         iteration = 0
@@ -70,6 +71,6 @@ def mandel(size, max_iteration, x_center, y_center, zoom):
 
         for y in range(worker, size, workers):
             row = chr(y >> 16 & 0xff) + chr(y >> 8 & 0xff) + chr(y & 0xff)
-            data = render_row(((y_center + zoom * float(y - size / 2) / size),
+            data = render_row((convert_y2i(y, y_center, size, zoom),
                                size, max_iteration, x_center, zoom))
             os.write(worker_map[worker][1], row + data)
