@@ -3,7 +3,7 @@ from __future__ import division
 from mandel_shared import *
 
 
-def mandel(rfd, wfd, size, max_iteration, x_center, y_center, zoom):
+def mandel(size, max_iteration, x_center, y_center, zoom):
     rows = []
     for j in xrange(size):
         cols = []
