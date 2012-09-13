@@ -9,13 +9,9 @@ y_center = 0.0
 zoom = 4.0
 out_dir = path.join(path.curdir, 'out')
 
-x_center = -1.30996188862
-y_center = -0.0658154120439
-zoom = 1.19209289551e-07
-
-x_center = -1.30996188862
-y_center = -0.0658154120392
-zoom = 1.7763568394e-15
+# x_center = -1.30996188862
+# y_center = -0.0658154120439
+# zoom = 1.19209289551e-07
 
 
 def draw_text(im, text, pos):
