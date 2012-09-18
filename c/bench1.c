@@ -18,7 +18,7 @@ int main (void)
 
   mpfr_init2 (o, LPREC);
   mpfr_set_d (o, 2.0, GMP_RNDD);
-  for (i = 0; i <= 1000000; i++)
+  for (i = 0; i <= 50000000; i++)
     {
       mpfr_div (f, f, o, GMP_RNDD);
     }
