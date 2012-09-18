@@ -1,45 +1,62 @@
-void mandelbrot(int WIDTH, int HEIGHT, int maxIterations, double startX, double startY, double zoom) {
-	// Divide the screen into N equal sections and
-	// have N cores calculate each respective portion
-	#pragma omp parallel for private(complexReal, complexImaginary) schedule(dynamic)
-		for (x=0;x<WIDTH;x++) {
-			// Step through each pixel on the x axis
-			// Calculate the real part of the complex number represented 
-			// by all of the pixles with this x value
-			complexReal = startX + x*zoom;
-			int y;
-			for (y=0;y<HEIGHT;y++) {
-				// Calculate the imaginary part of the complex number
-				complexImaginary = startY - y*zoom;
-				// Setup initial Z value based on the complex number chosen
-				double realZ = complexReal;
-				double imaginaryZ = complexImaginary;
-				int neverDiverges = 1; // bool
-				unsigned n;
-				// Calculate Zn for 1<n<maxIterations
-				for (n=0; n<maxIterations; ++n)
-				{
-					double imaginarySquared = imaginaryZ*imaginaryZ;
-					double realSquared = realZ*realZ;
-					// simplified sqrt(realZ*realZ + imaginaryZ*imaginary) > 2
-					if (realSquared + imaginarySquared > 4) {
-						// Must diverge to infinity
-						neverDiverges = 0;
-						break;
-					}
-					imaginaryZ = 2*realZ*imaginaryZ + complexImaginary;
-					realZ = realSquared - imaginarySquared + complexReal;
+#include <stdio.h>
+#include <stdlib.h>
+
+#define WIDTH 500
+#define HEIGHT 500
+
+void mandel(char* out, int width, int height, int maxIterations, double centerX, double centerY, double zoom) {
+	int xi, yi;
+	double x, y, a, b, oa;
+
+    for (xi=0;xi<width;xi++) {
+    	x = centerX + zoom * (xi - width / 2.0) / width;
+
+		for (yi=0;yi<height;yi++) {
+			unsigned n;
+			int idx;
+
+			y = centerY + zoom * (yi - height / 2.0) / height;
+
+	        a = oa = 0;
+	        b = 0;
+
+	        for (n=0; n<maxIterations; n++) {
+	        	double aS = a * a;
+				double bS = b * b;
+
+				if (aS + bS > 4) {
+					break;
 				}
-				if ( neverDiverges ) {
-					// Complex number associated with pixel (x,y) 
-					// does not diverge to Infinity for set
-					// Draw it black
-					putpixel(x, y, black);
-				} else {
-					// Diverges... pick a color for it based on how 
-					// quickly it diverges, ie n iterations
-					putpixel(x, y, colors[n]);
-				}
-			}
-		}
+
+	        	a = aS - bS + x;
+	        	b = 2 * oa * b + y;
+	        	oa = a;
+	        }
+
+	        idx = yi * height + xi;
+	        if (n == maxIterations) {
+	        	out[idx] = 0;
+	        }
+	        else {
+	            out[idx] = 255 - (n * 10 % 255);
+	        }
+	    }
+    }
+}
+
+int main(int argc, char *argv[]) {
+	int itermax = atoi(argv[1]);		/* how many iterations to do	*/
+	// double magnify=atof(argv[3]);		/* no magnification		*/
+	// int res = atoi(argv[1]);
+	char* out = (char*) malloc(WIDTH * HEIGHT);
+	// mandelbrot(out, WIDTH, HEIGHT, itermax, -3, -2, 3.0);
+	mandel(out, WIDTH, HEIGHT, itermax, -1.0, 0, 4.0);
+
+	printf("P5\n%d %d\n255\n", WIDTH, HEIGHT);
+	int i;
+	for (i=0;i<WIDTH*HEIGHT;i++) {
+		printf("%c", out[i]);
+    }
+
+	free(out);
 }
